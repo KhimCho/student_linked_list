@@ -1,0 +1,221 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct student
+{
+	string name;
+	string id;
+	float a_score;
+	
+	friend istream& operator>>(istream& is, student &obj);
+	friend ostream& operator<<(ostream& os, student &obj);
+	bool operator<=(student obj);
+};
+
+istream& operator>>(istream& is, student &obj)
+{
+
+	cout << "Nhap ten: ";
+	cin.ignore();
+	getline(is, obj.name);
+	cout << "Nhap id: ";
+	getline(is, obj.id);
+	cout << "Nhap diem: ";
+	is >> obj.a_score;
+	return is;
+}
+ostream& operator<<(ostream& os, student &obj)
+{
+	os << obj.name << endl << obj.id  << endl << obj.a_score;
+	return os;
+}
+bool student::operator<=(student obj)
+{
+	return (a_score <= obj.a_score);
+}
+
+struct node
+{
+	student data;
+	node *next = NULL;
+	node *prev = NULL;
+	node()
+	{
+		data.name = " ";
+		data.id = " ";
+		data.a_score = 0;
+	}
+	node(string _name, string _id, float _score)
+	{
+		data.name = _name;
+		data.id = _id;
+		data.a_score = _score;
+	}
+};
+
+struct list
+{
+	node *head = NULL;
+	node *tail = NULL;
+	bool is_empty();
+	void init(node *);
+	void add_student(node *);
+	bool find_by_name(node *);
+	void delete_by_id(node *);
+	void print_acceptable_student();
+	void sort_student_and_print();
+	void print()
+	{
+		node *ptr = head;
+		while (ptr != NULL)
+		{
+			cout << ptr->data;
+			ptr = ptr->next;
+		}
+	}
+};
+bool list::is_empty()
+{
+	return (head == NULL);
+}
+void list::init(node *obj)
+{
+	cout << "Nhap ten: ";
+	getline(cin, obj->data.name);
+	cout << "Nhap id: ";
+	getline(cin, obj->data.id);
+	cout << "Nhap diem: ";
+	cin >> obj->data.a_score;
+	head = obj;
+	tail = obj;
+}
+void list::add_student(node *obj)
+{
+	
+	if (is_empty())
+	{
+		init(obj);
+	}
+	else
+	{
+		cin >> obj->data;
+		obj->next = head;
+		head = obj;
+	}
+}
+
+bool list::find_by_name(node *obj)
+{
+	cin >> obj->data;
+	node *ptr = head;
+	while (ptr != NULL)
+	{
+		if (ptr->data.name == obj->data.name)
+			return true;
+	}
+	return false;
+}
+void list::delete_by_id(node *obj)
+{
+	cin >> obj->data;
+	node *ptr = head;
+	if (head->data.name == obj->data.name)
+	{
+		head = head->next;
+	}
+	else
+	while (ptr->next != NULL)
+	{
+		if (ptr->next->data.name == obj->data.name)
+			ptr->next = ptr->next->next;
+	}
+}
+
+void list::print_acceptable_student()
+{
+	node *ptr = head;
+	while (ptr != NULL)
+	{
+		if (ptr->data.a_score >= 5)
+		{
+			cout << ptr->data;
+			ptr = ptr->next;
+		}
+		else
+			ptr = ptr->next;
+	}
+}
+node * mergelist(node * l1, node *l2)
+{
+	node *ptr = new node;
+	node *curr = ptr;
+
+	while (l1 != NULL && l2 != NULL)
+	{
+		if (l1->data <= l2->data)
+		{
+			curr->next = l1;
+			l1 = l1->next;
+		}
+		else
+		{
+			curr->next = l2;
+			l2 = l2->next;
+		}
+
+		curr = curr->next;
+
+	}
+	if (l1 != NULL)
+	{
+		curr->next = l1;
+		l1 = l1->next;
+	}
+	if (l2 != NULL)
+	{
+		curr->next = l2;
+		l2 = l2->next;
+	}
+	return ptr->next;
+}
+
+
+node* sortList(node* head) {
+	if (head == NULL || head->next == NULL)
+		return head;
+	node *temp = NULL;
+	node *slow = head;
+	node *fast = head;
+	while (fast != NULL && fast->next != NULL)
+	{
+		temp = slow;
+		slow = slow->next;
+		fast = fast->next->next;
+
+	}
+	temp->next = NULL;
+	node * l1 = sortList(head);
+	node * l2 = sortList(slow);
+
+	return mergelist(l1, l2);
+}
+
+void list::sort_student_and_print()
+{
+	head = sortList(head);
+}
+
+int main()
+{
+	list classroom;
+	node *obj = new node;
+	classroom.add_student(obj);
+	obj = new node;
+	classroom.add_student(obj);
+	obj = new node;
+	classroom.add_student(obj);
+	classroom.sort_student_and_print();
+	classroom.print_acceptable_student();
+	system("pause");
+}
